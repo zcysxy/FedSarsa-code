@@ -41,7 +41,7 @@ mdp_nom.theta_st = theta_st; mdp_nom.P = P; mdp_nom.R = R; mdp_nom.p = p; mdp_no
 % M_list = [10 20 40 60];
 M_list = [1, 2, 5];
 
-method = 'mean';
+method = 'iid';
 num_epoch = 10;
 
 results = cell(1, length(M_list));
