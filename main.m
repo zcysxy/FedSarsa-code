@@ -14,8 +14,8 @@ S = 100;        % # of states
 d = 10;         % # of features
 Rmax = 1e2;       % reward cap
 gamma = 0.8;    % discount factor
-eps = 0.1;              % relative error of P
-eps_r = 0.1;            % relative error of R
+eps = 0;%0.1;              % relative error of P
+eps_r = 0;%0.1;            % relative error of R
 % Feature map
 phi = repmat(eye(d), [idivide(int32(S),int32(d),'ceil'), 1]);
 phi = phi(1:S,:);
