@@ -1,5 +1,7 @@
 # README
 
+## FedTD
+
 - `markov_gen.m` generates a MDP model
     - input: $|\mathcal{S}|$, $\gamma$, $d$
     - output: ~~fixed point~~, $P$, $r$, $\mu$, $\phi$
@@ -9,3 +11,5 @@
 - `basic_TD.m` TD learning for a single agent
     - includes mean-path, iid, and Markovian
 - `fedTD.m` FedTD for three methods
+
+## FedSARSA

@@ -1,4 +1,4 @@
-function [theta_ts, Ps, Rs, ps, phis] = markov_perturb(P, R, eps, gamma, r, eps_r, N)
+function [theta_ts, Ps, Rs, ps] = markov_perturb(P, R, eps, gamma, phi, eps_r, N)
     % Input: 
     %   - (P,R,gamma, r): MDP model 
     %   - (eps, eps_r): peuturb bound
@@ -17,10 +17,6 @@ function [theta_ts, Ps, Rs, ps, phis] = markov_perturb(P, R, eps, gamma, r, eps_
         % Extracting the stationary distribution
         p = W(:, 1); p = p .* sign(p); p = p / sum(p);
         D = diag(p);
-
-        % Generating the feature matrix
-        %------------------------------
-        phi = eye(S, r);
         
         Proj = phi * inv(phi' * D * phi) * phi' * D; %#ok<MINV>
         A = (eye(S, S) - gamma * Proj * P) * phi;
@@ -28,7 +24,6 @@ function [theta_ts, Ps, Rs, ps, phis] = markov_perturb(P, R, eps, gamma, r, eps_
         theta_t = A \ b; % fixed point of TD.
 
         ps(:,:,i) = p;
-        phis(:,:,i) = phi;
         theta_ts(:,:,i) = theta_t;
     end
 end

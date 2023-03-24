@@ -1,4 +1,4 @@
-function [agents] = batch_mdp_perturb(mdp, T, r, S, alpha, gamma, eps, eps_r, N)
+function [agents] = batch_mdp_perturb(mdp, T, r, S, alpha, gamma, eps, eps_r, N, phi)
     % generate N perturbed MDPs of the nominal MDP
 
     agents = cell(1, N);
@@ -17,13 +17,13 @@ function [agents] = batch_mdp_perturb(mdp, T, r, S, alpha, gamma, eps, eps_r, N)
     agents{1} = agent;
 
     % randomly generate MDPs
-    [theta_sts, Ps, Rs, ps, phis] = markov_perturb(P_nom, R_nom, eps, gamma, r, eps_r, N);
+    [theta_sts, Ps, Rs, ps] = markov_perturb(P_nom, R_nom, eps, gamma, phi, eps_r, N);
 
     for i = 2:N
         % use the same theta star for error comparison
         % mdp.theta_st = theta_st_nom;
         mdp.P = Ps(:, :, i); mdp.R = Rs(:, :, i);
-        mdp.p = ps(:, :, i); mdp.phi = phis(:, :, i);
+        mdp.p = ps(:, :, i);
         agent.mdp = mdp;
         agents{i} = agent;
     end
