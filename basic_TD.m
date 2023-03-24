@@ -13,7 +13,7 @@ r = 10; % rank of feature matrix
 % Description of Notation
 %--------------------------
 % theta_st ---> True fixed point
-% P ---> Transition matrix
+% P ---> Transition matrix  
 % R ---> Reward vector
 % p ---> Stationary distribution
 % phi ---> Feature matrix

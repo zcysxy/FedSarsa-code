@@ -2,6 +2,9 @@
 %------------------------------------------------------------------------------------%
 % clc; clear all; close all; %#ok<CLALL> 
 clear all;
+set(0, 'DefaultAxesFontSize', 15, 'DefaultAxesFontName', 'times', 'DefaultAxesFontWeight', 'bold')
+set(0, 'DefaultLineLineWidth', 2, 'DefaultAxesLineWidth', 1.5)
+set(0, 'DefaultTextInterpreter', 'latex', 'DefaultTextFontName', 'times', 'DefaultTextFontWeight', 'bold')
 
 M = 10; % no of agents
 K = 10; % local steps

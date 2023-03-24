@@ -4,15 +4,15 @@ function [theta_ts, Ps, Rs, ps, phis] = markov_perturb(P, R, eps, gamma, r, eps_
     %   - (eps, eps_r): peuturb bound
     %   - n: number of MDPs to generate
     S = size(P, 1);
-    Ps = repmat(P, [1,1,n]);
+    Ps = repmat(P, [1,1,N]);
     Ps = Ps + Ps .* (2 * rand(size(Ps)) - 1.0) * eps;
     Ps = Ps ./ sum(Ps,2);
 
     % R = R.*(ones(S, 1) + eps_r*(2*rand(S,1)- 1.0)); % reward vector
-    Rs = repmat(R, [1,1,n]);
-    Rs = Rs + Rs .* eps_r * randn(size(Rs));
+    Rs = repmat(R, [1,1,N]);
+    Rs = Rs + eps_r * Rs .* randn(size(Rs));
 
-    for i = 1:n
+    for i = 1:N
         [~, ~, W] = eig(Ps(:,:,i));
         % Extracting the stationary distribution
         p = W(:, 1); p = p .* sign(p); p = p / sum(p);
