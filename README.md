@@ -8,3 +8,4 @@
     - output: 3d layers with each layer the same as markov_gen output
 - `basic_TD.m` TD learning for a single agent
     - includes mean-path, iid, and Markovian
+- `fedTD.m` FedTD for three methods
