@@ -1,6 +1,7 @@
 % clc;
 % clear all;
 close all
+rng(0)
 
 %% Plot setup
 set(0, 'DefaultAxesFontSize', 15, 'DefaultAxesFontName', 'times', 'DefaultAxesFontWeight', 'bold')
@@ -11,14 +12,15 @@ set(0, 'DefaultLegendInterpreter', 'latex')
 %% Hyperparameters
 % MDP parameters
 S = 100;        % # of states
-d = 10;         % # of features
+d1 = 5;         % # of features for states
+d2 = 5;         % # of features for actions
 Rmax = 1e2;       % reward cap
 gamma = 0.8;    % discount factor
 eps = 0;%0.1;              % relative error of P
 eps_r = 0;%0.1;            % relative error of R
+
 % Feature map
-phi = repmat(eye(d), [idivide(int32(S),int32(d),'ceil'), 1]);
-phi = phi(1:S,:);
+phi = feature_gen(S, d1, d2);
 
 % Algorithm parameters
 % Ns = [10 20 40 60];   % # of agents
@@ -36,14 +38,13 @@ alpha = 0.1;            % step size
 % p ---> Stationary distribution
 % phi ---> Feature matrix
 
-% initialize the MDP for each agent
-[theta_st,P,R,p]= markov_gen(S, Rmax, gamma, phi);
-save('mdp_data.mat', 'theta_st', 'P', 'R', 'p');
+% initialize the MDP for the first agent
+agents = mdp_gen(S, Rmax, eps, eps_r, 1);
+% save('mdp_data.mat', 'theta_st', 'P', 'R', 'p');
+% data = load('mdp_data.mat');
 
-data = load('mdp_data.mat');
-theta_st = data.theta_st; P = data.P; R = data.R; p = data.p;
-mdp_nom = struct;
-mdp_nom.theta_st = theta_st; mdp_nom.P = P; mdp_nom.R = R; mdp_nom.p = p; mdp_nom.phi = phi;
+P0 = agents{1}.P;
+R0 = agents{1}.R;
 
 %%
 method = 'markov';
@@ -52,7 +53,7 @@ results = cell(1, length(Ns));
 for i = 1:length(Ns)
     fprintf('Current M = %d \n', Ns(i));
     N = Ns(i);
-    agents = batch_mdp_perturb(mdp_nom, T, d, S, alpha, gamma, eps, eps_r, N, phi);
+    agents = mdp_gen(P0, R0, eps, eps_r, N);
     agents = fedTD(agents, phi, T, K, method, trajs);
     results{i} = agents;
     save expr_1012_batch_K_30_eps_0dot1
