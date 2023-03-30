@@ -7,3 +7,4 @@ function a_ind = policy(values) %(phi, theta, s)
     % values = phi(s, as)' * theta;
 
     a_ind = randsample(1:length(values), 1, true, softmax(values, 1));
+    % [~, a_ind] = max(values);

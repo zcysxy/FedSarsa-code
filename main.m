@@ -16,7 +16,7 @@ d1 = 5;         % # of features for states
 d2 = 5;         % # of features for actions
 an = 100;       % number of candidate actions
 Rmax = 1;     % reward cap
-gamma = 0.8;    % discount factor
+gamma = 0.2;    % discount factor
 eps = 0;%0.1;              % relative error of P
 eps_r = 0;%0.1;            % relative error of R
 
@@ -26,9 +26,9 @@ phi = feature_gen(S, d1, d2);
 % Algorithm parameters
 % Ns = [10 20 40 60];   % # of agents
 Ns = [1, 2, 5, 10];     % # of agents
-trajs =  1;             % # of trajectories
+trajs =  5;             % # of trajectories
 K = 30;                 % local steps
-T = 30000;              % # of iterations
+T = 15000;              % # of iterations
 alpha = 0.1;            % step size
 
 % Description of Notation
@@ -46,14 +46,16 @@ P0 = agents{1}.P;
 R0 = agents{1}.R;
 
 %% Get reference theta_star
-load mdp_data.mat
-if ~theta_st
+
+if isfile('mdp_data.mat')
+    load mdp_data.mat
+else
     agent_ref = cell(1);
     agent_ref{1} = agents{1};
     opts.T = 5*T; opts.K = 5*T; opts.trajs = 1;
     opts.gamma = gamma; opts.alpha = alpha; opts.an = an*5;
     opts.log_err = false;
-    theta_st = zeros(d1*d2,0);
+    theta_st = zeros(d1*d2,1);
     for i = 1:10
         agent_ref = fedsarsa(agent_ref, phi, opts);
         theta_st = theta_st + agent_ref{1}.theta(:,end);
@@ -68,7 +70,7 @@ opts.gamma = gamma; opts.alpha = alpha; opts.an = an;
 opts.log_err = true; opts.theta_st = theta_st;
 results = cell(1, length(Ns));
 
-Ns = [1,10]; % tmp
+Ns = [1,2,10]; % tmp
 for i = 1:length(Ns)
     fprintf('Current N = %d \n', Ns(i));
     N = Ns(i);
