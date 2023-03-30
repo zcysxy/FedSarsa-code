@@ -26,10 +26,16 @@ function [agents] = fedsarsa(agents, phi, opts)
     alpha = opts.alpha;
     s_init = opts.s_init;
     an = opts.an;
-    as = rand(an,1);
 
     N = length(agents);
     d = size(phi(1,1), 1);
+    S = size(agents{1}.P,1);
+    if an == 0
+        as = linspace(0,1,S^2+1);
+    else
+        as = rand(an,1);
+    end
+
     for i = 1:N
         agents{i}.avg_err = zeros(1, T);
     end
@@ -58,7 +64,11 @@ function [agents] = fedsarsa(agents, phi, opts)
                 Pas = agents{i}.Pa(a_old, s_old); % distribution of s_t+1|s_t
                 rew = agents{i}.R(s_old, 1); % current reward
                 s_new = find(cumsum(Pas) > rand(1), 1); % new state s_t+1
-                as = rand(an,1);
+                if an == 0
+                    as = linspace(0,1,S^2+1);
+                else
+                    as = rand(an,1);
+                end
                 phi_cache = phi(s_new, as);
                 value_new = phi_cache' * theta_t;
                 a_new = as(policy(value_new));

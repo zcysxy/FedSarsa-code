@@ -53,7 +53,7 @@ else
     agent_ref = cell(1);
     agent_ref{1} = agents{1};
     opts.T = 5*T; opts.K = 5*T; opts.trajs = 1;
-    opts.gamma = gamma; opts.alpha = alpha; opts.an = an*5;
+    opts.gamma = gamma; opts.alpha = alpha; opts.an = 0;
     opts.log_err = false;
     theta_st = zeros(d1*d2,1);
     for i = 1:10
