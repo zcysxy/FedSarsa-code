@@ -33,7 +33,7 @@ function [agents] = fedsarsa(agents, phi, opts)
     if an == 0
         as = linspace(0,1,S^2+1);
     else
-        as = rand(an,1);
+        as = rand(1,an);
     end
 
     for i = 1:N
@@ -67,7 +67,7 @@ function [agents] = fedsarsa(agents, phi, opts)
                 if an == 0
                     as = linspace(0,1,S^2+1);
                 else
-                    as = rand(an,1);
+                    as = rand(1,an);
                 end
                 phi_cache = phi(s_new, as);
                 value_new = phi_cache' * theta_t;

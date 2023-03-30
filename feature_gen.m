@@ -4,7 +4,7 @@ function phi = feature_gen(S,d1,d2)
         siz = [d1*d2, length(a)];
         phi_sa = zeros(siz);
         is = mod(s,d1);
-        ia = floor(mod(a * S, d2) + 1)';
+        ia = floor(mod(a * S, d2) + 1);
         phi_sa(sub2ind(siz, is * d2 + ia, 1:length(a))) = 1;
     end
 end

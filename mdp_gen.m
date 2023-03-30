@@ -14,12 +14,12 @@ function [agents]= mdp_gen(SorP, Rmax, eps, eps_r, N)
     else
         R = rand(SorP,1) * Rmax;
         P = rand(SorP,SorP);
+        P = P ./ sum(P, 2);
     end
     
     Rs = repmat(R, [1,1,N]);
     Rs = Rs + eps_r * Rs .* randn(size(Rs));
 
-    P = P ./ sum(P, 2);
     Ps = repmat(P, [1,1,N]);
     Ps = Ps + Ps .* (2 * rand(size(Ps)) - 1.0) * eps;
     Ps = Ps ./ sum(Ps,2);

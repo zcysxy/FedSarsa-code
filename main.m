@@ -15,17 +15,17 @@ S = 100;        % # of states
 d1 = 5;         % # of features for states
 d2 = 5;         % # of features for actions
 an = 100;       % number of candidate actions
-Rmax = 1;     % reward cap
+Rmax = 1e2;     % reward cap
 gamma = 0.2;    % discount factor
-eps = 0;%0.1;              % relative error of P
-eps_r = 0;%0.1;            % relative error of R
+eps = 0.1;              % relative error of P
+eps_r = 0.1;            % relative error of R
 
 % Feature map
 phi = feature_gen(S, d1, d2);
 
 % Algorithm parameters
-% Ns = [10 20 40 60];   % # of agents
-Ns = [1, 2, 5, 10];     % # of agents
+Ns = [1,2,5,10,20,40,60];   % # of agents
+% Ns = [1, 2, 5, 10];     % # of agents
 trajs =  5;             % # of trajectories
 K = 30;                 % local steps
 T = 15000;              % # of iterations
@@ -77,14 +77,14 @@ for i = 1:length(Ns)
     agents = mdp_gen(P0, R0, eps, eps_r, N);
     agents = fedsarsa(agents, phi, opts);
     results{i} = agents;
-    save expr_1012_batch_K_30_eps_0dot1
 end
+save(sprintf('bkup_%0.0f.mat',clock))
 
 %% plot the errors
 figure
 
 for i = 1:length(Ns)
-    err = results{i}{1}.avg_err;
+    err = results{i}{end}.avg_err;
     plot_err = err(K:K:end);
     semilogy(K:K:T, plot_err, 'DisplayName', sprintf('$N = %d$', Ns(i)));
     hold on
