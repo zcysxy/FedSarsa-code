@@ -11,11 +11,11 @@ set(0, 'DefaultLegendInterpreter', 'latex')
 
 %% Hyperparameters
 % MDP parameters
-S = 100;        % # of states
+S = 10;        % # of states
 d1 = 5;         % # of features for states
 d2 = 5;         % # of features for actions
 an = 100;       % number of candidate actions
-Rmax = 1e2;     % reward cap
+Rmax = 1;     % reward cap
 gamma = 0.2;    % discount factor
 eps = 0.1;              % relative error of P
 eps_r = 0.1;            % relative error of R
@@ -26,7 +26,7 @@ phi = feature_gen(S, d1, d2);
 % Algorithm parameters
 Ns = [1,2,5,10,20,40,60];           % # of agents
 epss = [0, 0.1, 0.3, 0.8, 2, 8];    % # of agents
-trajs =  5;                         % # of trajectories
+trajs =  10;                         % # of trajectories
 K = 30;                             % local steps
 T = 15000;              % # of iterations
 alpha = 0.1;            % step size
@@ -51,11 +51,11 @@ if isfile('mdp_data.mat')
 else
     agent_ref = cell(1);
     agent_ref{1} = agents{1};
-    opts.T = 5*T; opts.K = 5*T; opts.trajs = 1;
+    opts.T = 3*T; opts.K = 5*T; opts.trajs = 1;
     opts.gamma = gamma; opts.alpha = alpha; opts.an = 0;
     opts.log_err = false;
     theta_st = zeros(d1*d2,1);
-    ref_trajs = 1;
+    ref_trajs = 15;
     for i = 1:ref_trajs
         agent_ref = fedsarsa(agent_ref, phi, opts);
         theta_st = theta_st + agent_ref{1}.theta(:,end);
@@ -71,7 +71,7 @@ opts.log_err = true; opts.theta_st = theta_st;
 results = cell(length(epss), length(Ns));
 
 Ns = [1,10]; % tmp
-epss = [0.1]; % tmp
+epss = [0]; % tmp
 for i = 1:length(epss)
     fprintf('Current eps = %f \n', epss(i));
     eps = epss(i); eps_r = eps;
@@ -83,7 +83,7 @@ for i = 1:length(epss)
         results{i, j} = agents;
     end
 end
-save(strcat('bkup', sprintf('%0.0f',clock), '.mat'))
+% save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'))
 
 %% Plot the errors
 for i = 1:length(epss)
