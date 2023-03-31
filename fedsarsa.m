@@ -17,6 +17,7 @@ function [agents] = fedsarsa(agents, phi, opts)
             error("Error: theta_star is not given!")
         end
         theta_st = opts.theta_st;
+        theta_st_norm = norm(theta_st);
     end
     
     T = opts.T;
@@ -83,7 +84,7 @@ function [agents] = fedsarsa(agents, phi, opts)
                 agents{i}.s = s_new; % continuity of trajectory
                 agents{i}.phi_cache = phi_cache;
                 if log_err
-                    agents{i}.err(:, t) = norm(theta_st - theta_t);
+                    agents{i}.err(:, t) = norm(theta_st - theta_t) / theta_st_norm;
                 end
             end
 
