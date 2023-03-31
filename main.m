@@ -46,7 +46,6 @@ P0 = agents{1}.P;
 R0 = agents{1}.R;
 
 %% Get reference theta_star
-
 if isfile('mdp_data.mat')
     load mdp_data.mat
 else
@@ -56,11 +55,12 @@ else
     opts.gamma = gamma; opts.alpha = alpha; opts.an = 0;
     opts.log_err = false;
     theta_st = zeros(d1*d2,1);
-    for i = 1:10
+    ref_trajs = 1;
+    for i = 1:ref_trajs
         agent_ref = fedsarsa(agent_ref, phi, opts);
         theta_st = theta_st + agent_ref{1}.theta(:,end);
     end
-    theta_st = theta_st / 10;
+    theta_st = theta_st / ref_trajs;
     save('mdp_data.mat', 'agent_ref', 'theta_st');
 end
 
@@ -83,7 +83,7 @@ for i = 1:length(epss)
         results{i, j} = agents;
     end
 end
-save(sprintf('bkup_%0.0f.mat',clock))
+save(strcat('bkup', sprintf('%0.0f',clock), '.mat'))
 
 %% Plot the errors
 for i = 1:length(epss)
