@@ -24,11 +24,10 @@ eps_r = 0.1;            % relative error of R
 phi = feature_gen(S, d1, d2);
 
 % Algorithm parameters
-Ns = [1,2,5,10,20,40,60];   % # of agents
-% Ns = [1, 2, 5, 10];     % # of agents
-epss = [0, 0.1, 0.3, 0.8, 2, 8];   % # of agents
-trajs =  5;             % # of trajectories
-K = 30;                 % local steps
+Ns = [1,2,5,10,20,40,60];           % # of agents
+epss = [0, 0.1, 0.3, 0.8, 2, 8];    % # of agents
+trajs =  5;                         % # of trajectories
+K = 30;                             % local steps
 T = 15000;              % # of iterations
 alpha = 0.1;            % step size
 
@@ -71,7 +70,8 @@ opts.gamma = gamma; opts.alpha = alpha; opts.an = an;
 opts.log_err = true; opts.theta_st = theta_st;
 results = cell(length(epss), length(Ns));
 
-%Ns = [1,2,10]; % tmp
+Ns = [1,10]; % tmp
+epss = [0.1]; % tmp
 for i = 1:length(epss)
     fprintf('Current eps = %f \n', epss(i));
     eps = epss(i); eps_r = eps;
