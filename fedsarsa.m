@@ -30,10 +30,12 @@ function [agents] = fedsarsa(agents, phi, opts)
     N = length(agents);
     d = size(phi(1,1), 1);
     S = size(agents{1}.P,1);
+    % Generate random action candidates
     if an == 0
-        as = linspace(0,1,S^2+1);
+        as_old = linspace(0,1,S^2+1);
+        as_new = as_old;
     else
-        as = rand(1,an);
+        as_old = rand(1,an);
     end
 
     for i = 1:N
@@ -48,30 +50,31 @@ function [agents] = fedsarsa(agents, phi, opts)
             agents{i}.err = zeros(1, T);
             agents{i}.s = s_init;
             agents{i}.theta = zeros(d, T);
-            agents{i}.phi_cache = phi(s_init, as);
+            agents{i}.phi_cache = phi(s_init, as_old);
         end
 
         for t = 1:T
             if mod(t, 1000) == 0; disp(t); end
 
+            % Generate random action candidates
+            if an ~= 0
+                as_new = rand(1,an);
+            end
+
             for i = 1:N
                 theta_t = agents{i}.theta(:,t);
                 s_old = agents{i}.s;
                 value_old = theta_t' * agents{i}.phi_cache;
-                a_old = as(policy(value_old));
+                a_old = as_old(policy(value_old));
 
                 % Generating the next state-action (s_t+1, a_t+1)
                 Pas = agents{i}.Pa(a_old, s_old); % distribution of s_t+1|s_t
                 rew = agents{i}.R(s_old, 1); % current reward
                 s_new = find(cumsum(Pas) > rand(1), 1); % new state s_t+1
-                if an == 0
-                    as = linspace(0,1,S^2+1);
-                else
-                    as = rand(1,an);
-                end
-                phi_cache = phi(s_new, as);
+
+                phi_cache = phi(s_new, as_new);
                 value_new = phi_cache' * theta_t;
-                a_new = as(policy(value_new));
+                a_new = as_new(policy(value_new));
 
                 % (R + γPϕθ − ϕθ) ϕᵀ
                 g = (rew + gamma * theta_t' * phi(s_new, a_new) - theta_t' * phi(s_old, a_old)) * phi(s_old, a_old);
@@ -83,6 +86,8 @@ function [agents] = fedsarsa(agents, phi, opts)
                     agents{i}.err(:, t) = norm(theta_st - theta_t);
                 end
             end
+
+            as_old = as_new;
 
             if mod(t + 1, K) == 0
                 % synchronize

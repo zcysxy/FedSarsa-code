@@ -26,6 +26,7 @@ phi = feature_gen(S, d1, d2);
 % Algorithm parameters
 Ns = [1,2,5,10,20,40,60];   % # of agents
 % Ns = [1, 2, 5, 10];     % # of agents
+epss = [0, 0.1, 0.3, 0.8, 2, 8];   % # of agents
 trajs =  5;             % # of trajectories
 K = 30;                 % local steps
 T = 15000;              % # of iterations
@@ -68,41 +69,46 @@ end
 opts.T = T; opts.K = K; opts.trajs = trajs;
 opts.gamma = gamma; opts.alpha = alpha; opts.an = an;
 opts.log_err = true; opts.theta_st = theta_st;
-results = cell(1, length(Ns));
+results = cell(length(epss), length(Ns));
 
-Ns = [1,2,10]; % tmp
-for i = 1:length(Ns)
-    fprintf('Current N = %d \n', Ns(i));
-    N = Ns(i);
-    agents = mdp_gen(P0, R0, eps, eps_r, N);
-    agents = fedsarsa(agents, phi, opts);
-    results{i} = agents;
+%Ns = [1,2,10]; % tmp
+for i = 1:length(epss)
+    fprintf('Current eps = %f \n', epss(i));
+    eps = epss(i); eps_r = eps;
+    for j = 1:length(Ns)
+        fprintf('Current N = %d \n', Ns(j));
+        N = Ns(j);
+        agents = mdp_gen(P0, R0, eps, eps_r, N);
+        agents = fedsarsa(agents, phi, opts);
+        results{i, j} = agents;
+    end
 end
 save(sprintf('bkup_%0.0f.mat',clock))
 
-%% plot the errors
-figure
+%% Plot the errors
+for i = 1:length(epss)
+    figure(i)
 
-for i = 1:length(Ns)
-    err = results{i}{end}.avg_err;
-    plot_err = err(K:K:end);
-    semilogy(K:K:T, plot_err, 'DisplayName', sprintf('$N = %d$', Ns(i)));
-    hold on
+    for j = 1:length(Ns)
+        err = results{i, j}{end}.avg_err;
+        semilogy(K:K:T, err(K:K:end), 'DisplayName', sprintf('$N = %d$', Ns(j)));
+        hold on
+    end
+
+    legend
+
+    xlim([1 T]);
+    xlabel('${{t}}$', 'FontSize', 30);
+    ylabel('$e_t$', 'FontSize', 30);
+    grid on;
+    title(['K = ', num2str(K), ' rel err = ', num2str(epss(i))]);
+
+    ax = gca;
+    outerpos = ax.OuterPosition;
+    ti = ax.TightInset;
+    left = outerpos(1) + ti(1);
+    bottom = outerpos(2) + ti(2);
+    ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
+    ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
+    ax.Position = [left bottom ax_width ax_height];
 end
-
-legend
-
-xlim([1 T]);
-xlabel('${{t}}$', 'FontSize', 30);
-ylabel('$e_t$', 'FontSize', 30);
-grid on;
-title(['K = ', num2str(K), ' rel err = ', num2str(eps)]);
-
-ax = gca;
-outerpos = ax.OuterPosition;
-ti = ax.TightInset;
-left = outerpos(1) + ti(1);
-bottom = outerpos(2) + ti(2);
-ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
-ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
-ax.Position = [left bottom ax_width ax_height];
