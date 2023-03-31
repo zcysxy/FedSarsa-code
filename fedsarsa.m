@@ -35,6 +35,9 @@ function [agents] = fedsarsa(agents, phi, opts)
     if an == 0
         as_old = linspace(0,1,S^2+1);
         as_new = as_old;
+    elseif an == -1
+        as_old = [0.54];
+        as_new = as_old;
     else
         as_old = rand(1,an);
     end
@@ -58,7 +61,7 @@ function [agents] = fedsarsa(agents, phi, opts)
             if mod(t, 1000) == 0; disp(t); end
 
             % Generate random action candidates
-            if an ~= 0
+            if an > 0
                 as_new = rand(1,an);
             end
 
@@ -84,7 +87,8 @@ function [agents] = fedsarsa(agents, phi, opts)
                 agents{i}.s = s_new; % continuity of trajectory
                 agents{i}.phi_cache = phi_cache;
                 if log_err
-                    agents{i}.err(:, t) = norm(theta_st - theta_t) / theta_st_norm;
+                    % agents{i}.err(:, t) = norm(theta_st - theta_t) / theta_st_norm;
+                    agents{i}.err(:, t) = norm(theta_st - theta_t)^2;
                 end
             end
 

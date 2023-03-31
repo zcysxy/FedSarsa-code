@@ -17,18 +17,24 @@ function [agents]= mdp_gen(SorP, Rmax, eps, eps_r, N)
         %R_switch = 0.95;
         %R(R > R_switch) = R(R > R_switch) * 10;
         %R(R <= R_switch) = R(R <= R_switch) / 10;
-        %R = rescale(R) * Rmax;
+        
+        % Make reward non-random
         R = zeros(SorP,1);
         R(end) = 1;
 
+        R = rescale(R) * Rmax;
+
         %P = rand(SorP,SorP);
-        %% Make kernel non-uniform
+        % Make kernel non-uniform
         %P_switch = 0.7;
         %P(P > P_switch) = P(P > P_switch) * 10;
         %P(P <= P_switch) = P(P <= P_switch) / 10;
-        %P = P ./ sum(P, 2);
+
+        % Make kernel non-random
         P = zeros(SorP,SorP);
         P(:,1) = 1;
+
+        P = P ./ sum(P, 2);
     end
     
     Rs = repmat(R, [1,1,N]);
