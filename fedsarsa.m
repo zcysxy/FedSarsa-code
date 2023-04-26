@@ -27,14 +27,16 @@ function [agents] = fedsarsa(agents, phi, opts)
     alpha = opts.alpha;
     s_init = opts.s_init;
     an = opts.an;
+    dict_A = opts.dict_A;
+    alpha0 = opts.alpha;
 
     N = length(agents);
     d = size(phi(1,1), 1);
     S = size(agents{1}.P,1);
     % Generate random action candidates
     if an == 0
-        as_old = linspace(0,1,S^2+1);
-        as_new = as_old;
+        % as_old = linspace(0,1,S^2+1);
+        % as_new = as_old;
     elseif an == -1
         as_old = [0.54];
         as_new = as_old;
@@ -54,11 +56,17 @@ function [agents] = fedsarsa(agents, phi, opts)
             agents{i}.err = zeros(1, T);
             agents{i}.s = s_init;
             agents{i}.theta = zeros(d, T);
-            agents{i}.phi_cache = phi(s_init, as_old);
+            agents{i}.phi_cache = phi(s_init);
         end
 
         for t = 1:T
             if mod(t, 1000) == 0; disp(t); end
+
+            % Step size
+            switch opts.method
+                case 'piece_linear'
+                    alpha = max(1e-4, alpha0/(10^(floor(log10(T))))); % 1
+            end
 
             % Generate random action candidates
             if an > 0
@@ -69,16 +77,22 @@ function [agents] = fedsarsa(agents, phi, opts)
                 theta_t = agents{i}.theta(:,t);
                 s_old = agents{i}.s;
                 value_old = theta_t' * agents{i}.phi_cache;
-                a_old = as_old(policy(value_old));
+                % a_old = as_old(policy(value_old));
+                feat_a_index = policy(value_old);
+                a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
+                a_old = a_cand(randi(numel(a_cand))) / size(dict_A,2);
 
                 % Generating the next state-action (s_t+1, a_t+1)
                 Pas = agents{i}.Pa(a_old, s_old); % distribution of s_t+1|s_t
                 rew = agents{i}.R(s_old, 1); % current reward
                 s_new = find(cumsum(Pas) > rand(1), 1); % new state s_t+1
 
-                phi_cache = phi(s_new, as_new);
+                phi_cache = phi(s_new);
                 value_new = phi_cache' * theta_t;
-                a_new = as_new(policy(value_new));
+                % a_new = as_new(policy(value_new));
+                feat_a_index = policy(value_new);
+                a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
+                a_new = a_cand(randi(numel(a_cand))) / size(dict_A,2);
 
                 % (R + γPϕθ − ϕθ) ϕᵀ
                 g = (rew + gamma * theta_t' * phi(s_new, a_new) - theta_t' * phi(s_old, a_old)) * phi(s_old, a_old);
@@ -92,7 +106,7 @@ function [agents] = fedsarsa(agents, phi, opts)
                 end
             end
 
-            as_old = as_new;
+            % as_old = as_new;
 
             if mod(t + 1, K) == 0
                 % synchronize
@@ -125,5 +139,6 @@ function [agents] = fedsarsa(agents, phi, opts)
             agents{i}.avg_err = agents{i}.avg_err / trajs;
         end
     end
+    disp(alpha)
 
 end

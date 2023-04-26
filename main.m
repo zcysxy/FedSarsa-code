@@ -21,6 +21,7 @@ eps_r = 0.1;    % relative error of R
 
 % Feature map
 phi = feature_gen(S, d1, d2);
+[dict_S, dict_A, feat_S, feat_A] = feature_map(S,d1,d2);
 
 % Algorithm parameters
 Ns = [1,2,5,10,20,40,60];           % # of agents
@@ -50,12 +51,15 @@ if isfile('mdp_data.mat')
 else
     agent_ref = cell(1);
     agent_ref{1} = agents{1};
-    opts.T = 1e2*T; opts.K = opts.T; opts.trajs = 1;
-    opts.gamma = gamma; 
-    opts.alpha = alpha/1e2; 
-    % opts.an = 0;
+    opts.T = 1e2*T; % 2e2*T
+    opts.K = opts.T; opts.trajs = 1;
+    opts.gamma = gamma;
+    opts.alpha = alpha*1e4; % 100
+    opts.method = 'piece_linear';
+    opts.an = 0;
     opts.log_err = true;
     opts.theta_st = zeros(d1*d2,1);
+    opts.dict_A = dict_A;
     theta_st = zeros(d1*d2,1);
     ref_trajs = 1;
     for i = 1:ref_trajs
@@ -63,7 +67,7 @@ else
         theta_st = theta_st + agent_ref{1}.theta(:,end);
     end
     theta_st = theta_st / ref_trajs;
-    save('mdp_data.mat', 'agent_ref', 'theta_st');
+%     save('mdp_data.mat', 'agent_ref', 'theta_st');
 
     figure 
     semilogy(K:K:opts.T, agent_ref{1}.avg_err(K:K:opts.T));

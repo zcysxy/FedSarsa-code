@@ -62,9 +62,10 @@ function out = P_gen_gen(P)
         S = size(P,1);
         a1 = int16(a * S^2);
         i = a1 / S;
-        j = a1 - i * S;
-        Pas = circshift(P, i);
-        Pas = circshift(Pas, j, 2);
+        % j = a1 - i * S;
+        % Pas = circshift(P, i);
+        % Pas = circshift(Pas, j, 2);
+        Pas = circshift(P, i, 2);
         if nargin == 2
             Pas = Pas(s,:);
         end
