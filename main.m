@@ -1,6 +1,5 @@
 % clc;
-clear all;
-close all
+clear all; close all;
 rng(0)
 
 %% Plot setup
@@ -17,19 +16,19 @@ d2 = 5;         % # of features for actions
 an = 100;       % number of candidate actions
 Rmax = 1e2;     % reward cap
 gamma = 0.2;    % discount factor
-eps = 0.1;              % relative error of P
-eps_r = 0.1;            % relative error of R
+eps = 0.1;      % relative error of P
+eps_r = 0.1;    % relative error of R
 
 % Feature map
 phi = feature_gen(S, d1, d2);
 
 % Algorithm parameters
 Ns = [1,2,5,10,20,40,60];           % # of agents
-epss = [0, 0.1, 0.3, 0.8, 2, 8];    % # of agents
+epss = [0, 0.1, 0.3, 0.8, 2, 8];    % heterogeneity
 trajs =  10;                        % # of trajectories
-K = 20;                             % local steps
-T = 5000;               % # of iterations
-alpha = 0.1;            % step size
+K = 10;                             % local steps
+T = 5000;                           % # of iterations
+alpha = 1e-2;                       % step size
 
 % Description of Notation
 %--------------------------
@@ -51,17 +50,23 @@ if isfile('mdp_data.mat')
 else
     agent_ref = cell(1);
     agent_ref{1} = agents{1};
-    opts.T = 5*T; opts.K = 5*T; opts.trajs = 1;
-    opts.gamma = gamma; opts.alpha = alpha; opts.an = 0;
-    opts.log_err = false;
+    opts.T = 1e2*T; opts.K = opts.T; opts.trajs = 1;
+    opts.gamma = gamma; 
+    opts.alpha = alpha/1e2; 
+    % opts.an = 0;
+    opts.log_err = true;
+    opts.theta_st = zeros(d1*d2,1);
     theta_st = zeros(d1*d2,1);
-    ref_trajs = 20;
+    ref_trajs = 1;
     for i = 1:ref_trajs
         agent_ref = fedsarsa(agent_ref, phi, opts);
         theta_st = theta_st + agent_ref{1}.theta(:,end);
     end
     theta_st = theta_st / ref_trajs;
     save('mdp_data.mat', 'agent_ref', 'theta_st');
+
+    figure 
+    semilogy(K:K:opts.T, agent_ref{1}.avg_err(K:K:opts.T));
 end
 
 %% Run
