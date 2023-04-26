@@ -51,36 +51,39 @@ if isfile('mdp_data.mat')
 else
     agent_ref = cell(1);
     agent_ref{1} = agents{1};
-    opts.T = 1e2*T; % 2e2*T
+    opts.T = 2e2*T;
     opts.K = opts.T; opts.trajs = 1;
     opts.gamma = gamma;
-    opts.alpha = alpha*1e4; % 100
+    opts.alpha = alpha*1e0;
+    opts.L = 0.01;
     opts.method = 'piece_linear';
     opts.an = 0;
     opts.log_err = true;
     opts.theta_st = zeros(d1*d2,1);
     opts.dict_A = dict_A;
-    theta_st = zeros(d1*d2,1);
-    ref_trajs = 1;
+    ref_trajs = 10;
     for i = 1:ref_trajs
         agent_ref = fedsarsa(agent_ref, phi, opts);
         theta_st = theta_st + agent_ref{1}.theta(:,end);
     end
     theta_st = theta_st / ref_trajs;
-%     save('mdp_data.mat', 'agent_ref', 'theta_st');
+    save('mdp_data.mat', 'agent_ref', 'theta_st');
 
-    figure 
-    semilogy(K:K:opts.T, agent_ref{1}.avg_err(K:K:opts.T));
+    % figure 
+    % semilogy(K:K:opts.T, agent_ref{1}.avg_err(K:K:opts.T));
 end
 
 %% Run
-opts.T = T; opts.K = K; opts.trajs = trajs;
-opts.gamma = gamma; opts.alpha = alpha; opts.an = an;
+opts.T = T*5; opts.K = K; opts.trajs = trajs;
+opts.gamma = gamma; opts.alpha = alpha; opts.an = 0;
 opts.log_err = true; opts.theta_st = theta_st;
 results = cell(length(epss), length(Ns));
+opts.L = 0.01;
+opts.method = 'const';
+opts.dict_A = dict_A;
 
-%Ns = [1,2]; % tmp
-%epss = [0]; % tmp
+Ns = [1,80]; % tmp
+epss = [8]; % tmp
 for i = 1:length(epss)
     fprintf('Current eps = %f \n', epss(i));
     eps = epss(i); eps_r = eps;
@@ -92,21 +95,29 @@ for i = 1:length(epss)
         results{i, j} = agents;
     end
 end
-save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'))
+save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
 
 %% Plot the errors
+colors = ['r', 'b'];
 for i = 1:length(epss)
     figure(i)
 
     for j = 1:length(Ns)
         err = results{i, j}{end}.avg_err;
-        semilogy(K:K:T, err(K:K:T), 'DisplayName', sprintf('$N = %d$', Ns(j)));
+        semilogy(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$N = %d$', Ns(j)));
+%         err_mat = [];
+%         for k = 1:trajs*2
+%             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
+%         end
+%         line = stdshade(err_mat(:,K:10*K:opts.T),0.5,colors(j),K:10*K:size(err_mat,2),12);
+%         set(gca, 'YScale', 'log')
+%         ylim([3e0,1.3e2])
         hold on
     end
 
     legend
 
-    xlim([1 T]);
+    xlim([1 opts.T]);
     xlabel('${{t}}$', 'FontSize', 30);
     ylabel('$e_t$', 'FontSize', 30);
     grid on;

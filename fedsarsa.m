@@ -7,6 +7,7 @@ function [agents] = fedsarsa(agents, phi, opts)
     if ~isfield(opts, 'trajs'), opts.trajs = 10; end
     if ~isfield(opts, 'gamma'), opts.gamma = 0.8; end
     if ~isfield(opts, 'alpha'), opts.alpha = 0.1; end
+    if ~isfield(opts, 'L'), opts.L = 0.01; end
     if ~isfield(opts, 's_init'), opts.s_init = 1; end
     if ~isfield(opts, 'an'), opts.an  = 100; end
     if ~isfield(opts, 'log_err'), opts.log_err  = false; end
@@ -25,6 +26,7 @@ function [agents] = fedsarsa(agents, phi, opts)
     trajs = opts.trajs;
     gamma = opts.gamma;
     alpha = opts.alpha;
+    L = opts.L;
     s_init = opts.s_init;
     an = opts.an;
     dict_A = opts.dict_A;
@@ -60,12 +62,15 @@ function [agents] = fedsarsa(agents, phi, opts)
         end
 
         for t = 1:T
-            if mod(t, 1000) == 0; disp(t); end
+            if mod(t, 5000) == 0; disp(t); end
 
             % Step size
             switch opts.method
                 case 'piece_linear'
-                    alpha = max(1e-4, alpha0/(10^(floor(log10(T))))); % 1
+                    factor = log10(alpha0) + 5;
+                    alpha = alpha0/(10^floor(t / (T/factor)));
+                case 'const'
+                    alpha = alpha0;
             end
 
             % Generate random action candidates
@@ -78,7 +83,7 @@ function [agents] = fedsarsa(agents, phi, opts)
                 s_old = agents{i}.s;
                 value_old = theta_t' * agents{i}.phi_cache;
                 % a_old = as_old(policy(value_old));
-                feat_a_index = policy(value_old);
+                feat_a_index = policy(value_old, L);
                 a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
                 a_old = a_cand(randi(numel(a_cand))) / size(dict_A,2);
 
@@ -90,7 +95,7 @@ function [agents] = fedsarsa(agents, phi, opts)
                 phi_cache = phi(s_new);
                 value_new = phi_cache' * theta_t;
                 % a_new = as_new(policy(value_new));
-                feat_a_index = policy(value_new);
+                feat_a_index = policy(value_new, L);
                 a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
                 a_new = a_cand(randi(numel(a_cand))) / size(dict_A,2);
 
@@ -139,6 +144,5 @@ function [agents] = fedsarsa(agents, phi, opts)
             agents{i}.avg_err = agents{i}.avg_err / trajs;
         end
     end
-    disp(alpha)
 
 end
