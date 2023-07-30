@@ -61,6 +61,12 @@ function [agents] = fedsarsa(agents, phi, opts)
             agents{i}.phi_cache = phi(s_init);
         end
 
+        if strcmp(opts.method, 'linear')
+            a = 1/(alpha0 * 1) - 1;
+            theta_t_aff = (a + 1) * agents{i}.theta(:,1);
+            C = (a + 1);
+        end
+
         for t = 1:T
             if mod(t, 5000) == 0; disp(t); end
 
@@ -71,6 +77,8 @@ function [agents] = fedsarsa(agents, phi, opts)
                     alpha = alpha0/(10^floor(t / (T/factor)));
                 case 'const'
                     alpha = alpha0;
+                case 'linear'
+                    alpha = alpha0 * (1+a) / (1 + a + t);
             end
 
             % Generate random action candidates
@@ -107,7 +115,14 @@ function [agents] = fedsarsa(agents, phi, opts)
                 agents{i}.phi_cache = phi_cache;
                 if log_err
                     % agents{i}.err(:, t) = norm(theta_st - theta_t) / theta_st_norm;
-                    agents{i}.err(:, t) = norm(theta_st - theta_t)^2;
+                    if strcmp(opts.method, 'linear')
+                        theta_t_aff = theta_t_aff + (a + t) * theta_t;
+                        C = C + a + t;
+                        theta_t_cvx = theta_t_aff / C;
+                        agents{i}.err(:, t) = norm(theta_st - theta_t_cvx)^2;
+                    else
+                        agents{i}.err(:, t) = norm(theta_st - theta_t)^2;
+                    end
                 end
             end
 

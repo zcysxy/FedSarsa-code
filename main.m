@@ -74,16 +74,16 @@ else
 end
 
 %% Run
-opts.T = T*5; opts.K = K; opts.trajs = trajs;
+opts.T = T*4; opts.K = K; opts.trajs = trajs;
 opts.gamma = gamma; opts.alpha = alpha; opts.an = 0;
 opts.log_err = true; opts.theta_st = theta_st;
 results = cell(length(epss), length(Ns));
 opts.L = 0.01;
-opts.method = 'const';
+opts.method = 'linear';
 opts.dict_A = dict_A;
 
-Ns = [1,80]; % tmp
-epss = [8]; % tmp
+Ns = [1,2,20]; % tmp
+epss = [0]; % tmp
 for i = 1:length(epss)
     fprintf('Current eps = %f \n', epss(i));
     eps = epss(i); eps_r = eps;
@@ -95,16 +95,22 @@ for i = 1:length(epss)
         results{i, j} = agents;
     end
 end
-save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
+% save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
 
 %% Plot the errors
 colors = ['r', 'b'];
+switch opts.method
+    case 'linear'
+        plot_cus = @plot;
+    case 'const'
+        plot_cus = @semilogy;
+end
 for i = 1:length(epss)
     figure(i)
 
     for j = 1:length(Ns)
         err = results{i, j}{end}.avg_err;
-        semilogy(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$N = %d$', Ns(j)));
+        plot(K:1:opts.T, err(K:1:opts.T), 'DisplayName', sprintf('$N = %d$', Ns(j)));
 %         err_mat = [];
 %         for k = 1:trajs*2
 %             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
