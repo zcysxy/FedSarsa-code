@@ -91,9 +91,13 @@ function [agents] = fedsarsa(agents, phi, opts)
                 s_old = agents{i}.s;
                 value_old = theta_t' * agents{i}.phi_cache;
                 % a_old = as_old(policy(value_old));
-                feat_a_index = policy(value_old, L);
-                a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
-                a_old = a_cand(randi(numel(a_cand))) / size(dict_A,2);
+                %% Sarsa
+                % feat_a_index = policy(value_old, L);
+                % a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
+                % a_old = a_cand(randi(numel(a_cand))) / size(dict_A,2);
+
+                %% TD
+                a_old = 0;
 
                 % Generating the next state-action (s_t+1, a_t+1)
                 Pas = agents{i}.Pa(a_old, s_old); % distribution of s_t+1|s_t
@@ -103,9 +107,10 @@ function [agents] = fedsarsa(agents, phi, opts)
                 phi_cache = phi(s_new);
                 value_new = phi_cache' * theta_t;
                 % a_new = as_new(policy(value_new));
-                feat_a_index = policy(value_new, L);
-                a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
-                a_new = a_cand(randi(numel(a_cand))) / size(dict_A,2);
+                % feat_a_index = policy(value_new, L);
+                % a_cand = dict_A(1,(dict_A(2,:) == feat_a_index - 1));
+                % a_new = a_cand(randi(numel(a_cand))) / size(dict_A,2);
+                a_new = a_old;
 
                 % (R + γPϕθ − ϕθ) ϕᵀ
                 g = (rew + gamma * theta_t' * phi(s_new, a_new) - theta_t' * phi(s_old, a_old)) * phi(s_old, a_old);
