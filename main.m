@@ -1,4 +1,3 @@
-% clc;
 clear all; close all;
 rng(0)
 
@@ -100,7 +99,7 @@ for k = 1:length(epss_r)
         end
     end
 end
-save(strcat('code/bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
+% save(strcat('code/bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
 
 %% Plot the errors
 switch opts.method
