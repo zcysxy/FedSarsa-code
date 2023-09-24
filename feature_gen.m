@@ -1,7 +1,7 @@
 function phi = feature_gen(S,d1,d2)
     phi = @phi_gen;
     function phi_sa = phi_gen(s,a)
-        if nargin == 1 % get all action values for a state
+        if nargin == 1 % get all action features for a state
             ia = 1:d2;
             a = ia;
         elseif nargin == 2

@@ -3,3 +3,4 @@
 *.mat
 *.pdf
 fig_td
+fig_sarsa

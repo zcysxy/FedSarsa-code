@@ -14,7 +14,7 @@ d1 = 5;         % # of features for states
 d2 = 5;         % # of features for actions
 an = 100;       % number of candidate actions
 % Rmax = 1e2;     % reward cap
-Rmax = 1;       % reward cap
+Rmax = 1e1;     % reward cap
 gamma = 0.2;    % discount factor
 eps = 0.1;      % relative error of P
 eps_r = 0.1;    % relative error of R
@@ -24,12 +24,15 @@ phi = feature_gen(S, d1, d2);
 [dict_S, dict_A, feat_S, feat_A] = feature_map(S,d1,d2);
 
 % Algorithm parameters
-Ns = [1,2,5,10,20,40,60];           % # of agents
-epss = [0, 0.1, 0.3, 0.8, 2, 8];    % heterogeneity
+% Ns = [1,2,5,10,20,40,60];           % # of agents
+% epss = [0, 0.1, 0.3, 0.8, 2, 8];    % heterogeneity
+Ns = [1,10,20,40];                  % # of agents
+epss = [0.1,0.5,1,2,5];             % kernel heterogeneity
+epss_r = [0.1,0.5,1,2,5];           % reward heterogeneity
 % trajs =  10;                      % # of trajectories
-trajs =  20;                        % # of trajectories
+trajs =  10;                        % # of trajectories
 K = 10;                             % local steps
-T = 5000;                           % # of iterations
+T = 2e4;                            % # of iterations
 alpha = 1e-2;                       % step size
 
 % Description of Notation
@@ -53,10 +56,10 @@ else
     agent_ref = cell(1);
     agent_ref{1} = agents{1};
     % opts.T = 2e2*T;
-    opts.T = 2e1*T;
+    opts.T = 1e1*T;
     opts.K = opts.T; opts.trajs = 1;
     opts.gamma = gamma;
-    opts.alpha = alpha*1e0;
+    opts.alpha = alpha;
     opts.L = 0.01;
     opts.method = 'piece_linear';
     opts.an = 0;
@@ -85,9 +88,8 @@ opts.L = 0.01;
 opts.method = 'const';
 opts.dict_A = dict_A;
 
-Ns = [1,10,20,40]; % tmp
-epss = [0.1,0.5,1,2,5]; % tmp
-epss_r = [0.1,0.5,1,2,5]; % tmp
+Ns = [1,10]; % tmp
+epss = [0]; % tmp
 results = cell(length(epss_r), length(epss), length(Ns));
 for k = 1:length(epss_r)
     fprintf('Current eps_r = %f \n', epss_r(k));
@@ -113,12 +115,12 @@ switch opts.method
         plot_cus = @semilogy;
 end
 rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
-for j = 1:length(Ns)
+for k = 1:length(epss_r)
     for i = 1:length(epss)
         figure()
-        for k = 1:length(epss_r)
+        for j = 1:length(Ns)
             err = results{k,i,j}{end}.avg_err;
-            plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_r = %.1f$', epss_r(k)));
+            plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$N = %d$', Ns(j)));
             %         err_mat = [];
             %         for k = 1:trajs*2
             %             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
@@ -136,7 +138,7 @@ for j = 1:length(Ns)
         xlabel('${{t}}$', 'FontSize', 30);
         ylabel('$e_t$', 'FontSize', 30);
         grid on;
-        title(sprintf('$N = %d, \\epsilon = %.1f$', Ns(j), epss(i)), 'Interpreter', 'latex', 'FontSize', 20);
+        title(sprintf('$\\epsilon_p = %.1f, \\epsilon_r = %.1f$', epss(i), epss_r(k)), 'Interpreter', 'latex', 'FontSize', 20);
         % pause
         
         ax = gca;
@@ -147,7 +149,7 @@ for j = 1:length(Ns)
         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
         ax.Position = [left bottom ax_width ax_height];
-        exportgraphics(gca, sprintf('code/sarsa/%d_%.1f.png', Ns(j), epss(k)), 'Resolution', 600)
+        exportgraphics(gca, sprintf('fig_sarsa/%d_%.1f.png', Ns(j), epss_r(k)), 'Resolution', 600)
     end
 end
 
@@ -174,17 +176,17 @@ end
 %             %         ylim([3e0,1.3e2])
 %             hold on
 %         end
-        
+
 %         yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
 %         legend
-        
+
 %         xlim([1 opts.T]);
 %         xlabel('${{t}}$', 'FontSize', 30);
 %         ylabel('$e_t$', 'FontSize', 30);
 %         grid on;
 %         title(sprintf('$N = %d$', Ns(j)), 'Interpreter', 'latex', 'FontSize', 20);
 %         % pause
-        
+
 %         ax = gca;
 %         outerpos = ax.OuterPosition;
 %         ti = ax.TightInset;
