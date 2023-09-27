@@ -1,5 +1,5 @@
 clear all; close all;
-rng(0)
+% rng(0)
 
 %% Plot setup
 set(0, 'DefaultAxesFontSize', 15, 'DefaultAxesFontName', 'times', 'DefaultAxesFontWeight', 'bold')
@@ -24,12 +24,10 @@ phi = feature_gen(S, d1, d2);
 [dict_S, dict_A, feat_S, feat_A] = feature_map(S,d1,d2);
 
 % Algorithm parameters
-% Ns = [1,2,5,10,20,40,60];           % # of agents
-% epss_p = [0, 0.1, 0.3, 0.8, 2, 8];    % heterogeneity
-Ns = [1,2,5,10,20,40];                  % # of agents
+Ns = [1,2,5,10,20,40];              % # of agents
 epss_p = [0,0.1,0.2,0.5,1,2];       % kernel heterogeneity
 epss_r = [0,0.1,0.2,0.5,1,2];       % reward heterogeneity
-trajs =  10;                      % # of trajectories
+trajs =  10;                        % # of trajectories
 K = 10;                             % local steps
 T = 2e4;                            % # of iterations
 alpha = 1e-2;                       % step size
@@ -102,7 +100,7 @@ for k = 1:length(epss_r)
         end
     end
 end
-% save(strcat('code/bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
+save(strcat('code/bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
 
 %% Plot the errors
 switch opts.method
@@ -133,7 +131,7 @@ for k = 1:length(epss_r)
         
         xlim([1 opts.T]);
         xlabel('${{t}}$', 'FontSize', 30);
-        ylabel('$e_t$', 'FontSize', 30);
+        ylabel('MSE', 'FontSize', 30);
         grid on;
         title(sprintf('$\\epsilon_p = %.1f, \\epsilon_r = %.1f$', epss_p(i), epss_r(k)), 'Interpreter', 'latex', 'FontSize', 20);
         % pause
@@ -180,7 +178,7 @@ end
 
 %         xlim([1 opts.T]);
 %         xlabel('${{t}}$', 'FontSize', 30);
-%         ylabel('$e_t$', 'FontSize', 30);
+%         ylabel('MSE', 'FontSize', 30);
 %         grid on;
 %         title(sprintf('$N = %d$', Ns(j)), 'Interpreter', 'latex', 'FontSize', 20);
 %         % pause
