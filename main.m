@@ -23,10 +23,10 @@ phi = feature_gen(S, d1, d2);
 [dict_S, dict_A, feat_S, feat_A] = feature_map(S,d1,d2);
 
 % Algorithm parameters
-Ns = [1,2,5,10,20,40;           % # of agents
+Ns = [1,2,5,10,20,40];           % # of agents
 epss_p = [0,0.1,0.2,0.5,1,2];    % heterogeneity
 epss_r = [0,0.1,0.2,0.5,1,2];    % heterogeneity
-trajs =  20;                        % # of trajectories
+trajs =  10;                        % # of trajectories
 K = 10;                             % local steps
 T = 5000;                           % # of iterations
 alpha = 1e-2;                       % step size
@@ -82,9 +82,6 @@ opts.L = 0.01;
 opts.method = 'const';
 opts.dict_A = dict_A;
 
-Ns = [1,10,20,40]; % tmp
-epss_p = [0.1,0.5,1,2,5]; % tmp
-epss_r = [0.1,0.5,1,2,5]; % tmp
 results = cell(length(epss_r), length(epss_p), length(Ns));
 for k = 1:length(epss_r)
     for i = 1:length(epss_p)
@@ -102,104 +99,98 @@ for k = 1:length(epss_r)
 end
 save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
 
-%% Plot the errors
-switch opts.method
-    case 'linear'
-        plot_cus = @plot;
-    case 'const'
-        plot_cus = @semilogy;
-end
-rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
-for j = 1:length(Ns)
-    for i = 1:length(epss_p)
-        figure()
-        for k = 1:length(epss_r)
-            err = results{k,i,j}{end}.avg_err;
-            plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_r = %.1f$', epss_r(k)));
-            %         err_mat = [];
-            %         for k = 1:trajs*2
-            %             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
-            %         end
-            %         line = stdshade(err_mat(:,K:10*K:opts.T),0.5,colors(j),K:10*K:size(err_mat,2),12);
-            %         set(gca, 'YScale', 'log')
-            %         ylim([3e0,1.3e2])
-            hold on
-        end
-        
-        yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
-        legend
-        
-        xlim([1 opts.T]);
-        xlabel('${{t}}$', 'FontSize', 30);
-        ylabel('$e_t$', 'FontSize', 30);
-        grid on;
-        title(sprintf('$N = %d, \\epsilon = %.1f$', Ns(j), epss_p(i)), 'Interpreter', 'latex', 'FontSize', 20);
-        % pause
-        
-        ax = gca;
-        outerpos = ax.OuterPosition;
-        ti = ax.TightInset;
-        left = outerpos(1) + ti(1);
-        bottom = outerpos(2) + ti(2);
-        ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
-        ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
-        ax.Position = [left bottom ax_width ax_height];
-        exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss_p(k)), 'Resolution', 600)
-    end
-end
-
-%% Plot the errors
-switch opts.method
-    case 'linear'
-        plot_cus = @plot;
-    case 'const'
-        plot_cus = @semilogy;
-end
-rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
-for j = 1:length(Ns)
-    % for i = 1:length(epss_p)
-        figure()
-        for k = 1:length(epss_r)
-            err = results{k,k,j}{end}.avg_err;
-            plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon = \\epsilon_r = %.1f$', epss_r(k)));
-            %         err_mat = [];
-            %         for k = 1:trajs*2
-            %             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
-            %         end
-            %         line = stdshade(err_mat(:,K:10*K:opts.T),0.5,colors(j),K:10*K:size(err_mat,2),12);
-            %         set(gca, 'YScale', 'log')
-            %         ylim([3e0,1.3e2])
-            hold on
-        end
-        
-        yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
-        legend
-        
-        xlim([1 opts.T]);
-        xlabel('${{t}}$', 'FontSize', 30);
-        ylabel('$e_t$', 'FontSize', 30);
-        grid on;
-        title(sprintf('$N = %d$', Ns(j)), 'Interpreter', 'latex', 'FontSize', 20);
-        % pause
-        
-        ax = gca;
-        outerpos = ax.OuterPosition;
-        ti = ax.TightInset;
-        left = outerpos(1) + ti(1);
-        bottom = outerpos(2) + ti(2);
-        ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
-        ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
-        ax.Position = [left bottom ax_width ax_height];
-        exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss_p(k)), 'Resolution', 600)
-    % end
-end
-
-%% Get Phi
-Phi = zeros(S,d1*d2);
-for s = 1:S
-    Phi(s,:) = phi(s-1,0);
-end
-Phi = Phi(:,any(Phi,1));
-Proj = Phi / (Phi' * D * Phi) * Phi' * D;
-A = (eye(S) - gamma * Proj * agents{1}.P) * Phi;
-b = Proj * agents{1}.R;
+% %% Plot the errors
+% switch opts.method
+%     case 'linear'
+%         plot_cus = @plot;
+%     case 'const'
+%         plot_cus = @semilogy;
+% end
+% rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
+% for j = 1:length(Ns)
+%     for i = 1:length(epss_p)
+%         figure()
+%         for k = 1:length(epss_r)
+%             err = results{k,i,j}{end}.avg_err;
+%             plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_r = %.1f$', epss_r(k)));
+%             %         err_mat = [];
+%             %         for k = 1:trajs*2
+%             %             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
+%             %         end
+%             %         line = stdshade(err_mat(:,K:10*K:opts.T),0.5,colors(j),K:10*K:size(err_mat,2),12);
+%             %         set(gca, 'YScale', 'log')
+%             %         ylim([3e0,1.3e2])
+%             hold on
+%         end
+%         
+%         yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+%         legend
+%         
+%         xlim([1 opts.T]);
+%         xlabel('${{t}}$', 'FontSize', 30);
+%         ylabel('$e_t$', 'FontSize', 30);
+%         grid on;
+%         title(sprintf('$N = %d, \\epsilon = %.1f$', Ns(j), epss_p(i)), 'Interpreter', 'latex', 'FontSize', 20);
+%         % pause
+%         
+%         ax = gca;
+%         outerpos = ax.OuterPosition;
+%         ti = ax.TightInset;
+%         left = outerpos(1) + ti(1);
+%         bottom = outerpos(2) + ti(2);
+%         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
+%         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
+%         ax.Position = [left bottom ax_width ax_height];
+%         % exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss_p(k)), 'Resolution', 600)
+%     end
+% end
+%
+% %% Plot the errors
+% rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
+% for k = 1:length(epss_r)
+%     for i = 1:length(epss_p)
+%         figure()
+%         for j = 1:length(Ns)
+%             err = results{k,i,j}{end}.avg_err;
+%             plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon = \\epsilon_r = %.1f$', epss_r(k)));
+%             %         err_mat = [];
+%             %         for k = 1:trajs*2
+%             %             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
+%             %         end
+%             %         line = stdshade(err_mat(:,K:10*K:opts.T),0.5,colors(j),K:10*K:size(err_mat,2),12);
+%             %         set(gca, 'YScale', 'log')
+%             %         ylim([3e0,1.3e2])
+%             hold on
+%         end
+%         
+%         yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+%         legend
+%         
+%         xlim([1 opts.T]);
+%         xlabel('${{t}}$', 'FontSize', 30);
+%         ylabel('$e_t$', 'FontSize', 30);
+%         grid on;
+%         title(sprintf('$N = %d$', Ns(j)), 'Interpreter', 'latex', 'FontSize', 20);
+%         % pause
+%         
+%         ax = gca;
+%         outerpos = ax.OuterPosition;
+%         ti = ax.TightInset;
+%         left = outerpos(1) + ti(1);
+%         bottom = outerpos(2) + ti(2);
+%         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
+%         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
+%         ax.Position = [left bottom ax_width ax_height];
+%         % exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss_p(k)), 'Resolution', 600)
+%     end
+% end
+%
+% %% Get Phi
+% % Phi = zeros(S,d1*d2);
+% % for s = 1:S
+% %     Phi(s,:) = phi(s-1,0);
+% % end
+% % Phi = Phi(:,any(Phi,1));
+% % Proj = Phi / (Phi' * D * Phi) * Phi' * D;
+% % A = (eye(S) - gamma * Proj * agents{1}.P) * Phi;
+% % b = Proj * agents{1}.R;
