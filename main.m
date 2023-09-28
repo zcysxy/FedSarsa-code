@@ -1,5 +1,5 @@
 clear all; close all;
-rng(0)
+% rng(0)
 
 %% Plot setup
 set(0, 'DefaultAxesFontSize', 15, 'DefaultAxesFontName', 'times', 'DefaultAxesFontWeight', 'bold')
@@ -13,7 +13,7 @@ S = 100;        % # of states
 d1 = 5;         % # of features for states
 d2 = 5;         % # of features for actions
 an = 100;       % number of candidate actions
-Rmax = 1;     % reward cap
+Rmax = 1e1;     % reward cap
 gamma = 0.2;    % discount factor
 eps = 0.1;      % relative error of P
 eps_r = 0.1;    % relative error of R
@@ -23,8 +23,9 @@ phi = feature_gen(S, d1, d2);
 [dict_S, dict_A, feat_S, feat_A] = feature_map(S,d1,d2);
 
 % Algorithm parameters
-Ns = [1,2,5,10,20,40,60];           % # of agents
-epss = [0, 0.1, 0.3, 0.8, 2, 8];    % heterogeneity
+Ns = [1,2,5,10,20,40;           % # of agents
+epss_p = [0,0.1,0.2,0.5,1,2];    % heterogeneity
+epss_r = [0,0.1,0.2,0.5,1,2];    % heterogeneity
 trajs =  20;                        % # of trajectories
 K = 10;                             % local steps
 T = 5000;                           % # of iterations
@@ -82,15 +83,15 @@ opts.method = 'const';
 opts.dict_A = dict_A;
 
 Ns = [1,10,20,40]; % tmp
-epss = [0.1,0.5,1,2,5]; % tmp
+epss_p = [0.1,0.5,1,2,5]; % tmp
 epss_r = [0.1,0.5,1,2,5]; % tmp
-results = cell(length(epss_r), length(epss), length(Ns));
+results = cell(length(epss_r), length(epss_p), length(Ns));
 for k = 1:length(epss_r)
-    fprintf('Current eps_r = %f \n', epss_r(k));
-    for i = 1:length(epss)
-        fprintf('Current eps = %f \n', epss(i));
-        eps = epss(i); eps_r = epss_r(k);
+    for i = 1:length(epss_p)
+        eps = epss_p(i); eps_r = epss_r(k);
         for j = 1:length(Ns)
+            fprintf('Current eps_r = %f \n', epss_r(k));
+            fprintf('Current eps = %f \n', epss_p(i));
             fprintf('Current N = %d \n', Ns(j));
             N = Ns(j);
             agents = mdp_gen(P0, R0, eps, eps_r, N);
@@ -99,7 +100,7 @@ for k = 1:length(epss_r)
         end
     end
 end
-% save(strcat('code/bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
+save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
 
 %% Plot the errors
 switch opts.method
@@ -110,7 +111,7 @@ switch opts.method
 end
 rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
 for j = 1:length(Ns)
-    for i = 1:length(epss)
+    for i = 1:length(epss_p)
         figure()
         for k = 1:length(epss_r)
             err = results{k,i,j}{end}.avg_err;
@@ -132,7 +133,7 @@ for j = 1:length(Ns)
         xlabel('${{t}}$', 'FontSize', 30);
         ylabel('$e_t$', 'FontSize', 30);
         grid on;
-        title(sprintf('$N = %d, \\epsilon = %.1f$', Ns(j), epss(i)), 'Interpreter', 'latex', 'FontSize', 20);
+        title(sprintf('$N = %d, \\epsilon = %.1f$', Ns(j), epss_p(i)), 'Interpreter', 'latex', 'FontSize', 20);
         % pause
         
         ax = gca;
@@ -143,7 +144,7 @@ for j = 1:length(Ns)
         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
         ax.Position = [left bottom ax_width ax_height];
-        exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss(k)), 'Resolution', 600)
+        exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss_p(k)), 'Resolution', 600)
     end
 end
 
@@ -156,7 +157,7 @@ switch opts.method
 end
 rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
 for j = 1:length(Ns)
-    % for i = 1:length(epss)
+    % for i = 1:length(epss_p)
         figure()
         for k = 1:length(epss_r)
             err = results{k,k,j}{end}.avg_err;
@@ -189,7 +190,7 @@ for j = 1:length(Ns)
         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
         ax.Position = [left bottom ax_width ax_height];
-        exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss(k)), 'Resolution', 600)
+        exportgraphics(gca, sprintf('code/fig_td/%d_%.1f.png', Ns(j), epss_p(k)), 'Resolution', 600)
     % end
 end
 

@@ -38,10 +38,13 @@ function [agents]= mdp_gen(SorP, Rmax, eps, eps_r, N)
     end
     
     Rs = repmat(R, [1,1,N]);
-    Rs = Rs + eps_r * Rs .* randn(size(Rs));
+    Rs = Rs + ((rand(size(Rs)) > 0.5)*2-1) .* eps_r .* Rmax;
+    Rs = max(-Rmax, min(Rmax,Rs));
 
     Ps = repmat(P, [1,1,N]);
-    Ps = Ps + Ps .* (2 * rand(size(Ps)) - 1.0) * eps;
+    Ps = Ps + (rand(size(Ps))*2-1) .* eps .* Ps;
+    Ps = Ps + ((rand(size(Ps)) > 0.5)*2-1) .* eps .* Ps;
+    Ps = max(0,Ps);
     Ps = Ps ./ sum(Ps,2);
     
     for i = 2:N
