@@ -29,7 +29,7 @@ epss_p = [0,0.1,0.2,0.5,1,2];       % kernel heterogeneity
 epss_r = [0,0.1,0.2,0.5,1,2];       % reward heterogeneity
 trajs =  10;                        % # of trajectories
 K = 10;                             % local steps
-T = 2e4;                            % # of iterations
+T = 5e3;                            % # of iterations
 alpha = 1e-2;                       % step size
 
 % Description of Notation
@@ -57,7 +57,7 @@ else
     opts.K = opts.T; opts.trajs = 1;
     opts.gamma = gamma;
     opts.alpha = alpha;
-    opts.L = 0.01;
+    opts.L = 1e2;
     opts.method = 'piece_linear';
     opts.an = 0;
     opts.log_err = true;
@@ -100,7 +100,9 @@ for k = 1:length(epss_r)
         end
     end
 end
-save(strcat('code/bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
+save(strcat('bkup/bkup', sprintf('%0.0f',clock), '.mat'), '-v7.3')
+
+
 
 %% Plot the errors
 switch opts.method

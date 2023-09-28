@@ -1,5 +1,8 @@
 function a_ind = policy(values, L) %(phi, theta, s)
     % Output an action based on the approximated value function
+
+    %% argmax
+    [~, a_ind] = max(values);
     
     %% Softmax
     % n = 100;
@@ -7,7 +10,7 @@ function a_ind = policy(values, L) %(phi, theta, s)
     % % random sample some candidate actions
     % values = phi(s, as)' * theta;
 
-    a_ind = randsample(1:length(values), 1, true, softmax(L * values, 1));
+    % a_ind = randsample(1:length(values), 1, true, softmax(L * values, 1));
     % [~, a_ind] = max(values);
 
     %% Plain
