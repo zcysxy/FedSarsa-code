@@ -1,24 +1,24 @@
-% clear all; close all;
-% rng(0)
-%
-% %% Plot setup
-% set(0, 'DefaultAxesFontSize', 15, 'DefaultAxesFontName', 'times', 'DefaultAxesFontWeight', 'bold')
-% set(0, 'DefaultLineLineWidth', 2, 'DefaultAxesLineWidth', 1.5)
-% set(0, 'DefaultTextInterpreter', 'latex', 'DefaultTextFontName', 'times', 'DefaultTextFontWeight', 'bold')
-% set(0, 'DefaultLegendInterpreter', 'latex')
-%
-% if ~exist('results', 'var') == 1
-%     load bkup/bkup2023925154454.mat
-% end
-%
-% rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
-%
-% switch opts.method
-%     case 'linear'
-%         plot_cus = @plot;
-%     case 'const'
-%         plot_cus = @semilogy;
-% end
+clear all; close all;
+rng(0)
+
+%% Plot setup
+set(0, 'DefaultAxesFontSize', 15, 'DefaultAxesFontName', 'times', 'DefaultAxesFontWeight', 'bold')
+set(0, 'DefaultLineLineWidth', 2, 'DefaultAxesLineWidth', 1.5)
+set(0, 'DefaultTextInterpreter', 'latex', 'DefaultTextFontName', 'times', 'DefaultTextFontWeight', 'bold')
+set(0, 'DefaultLegendInterpreter', 'latex')
+
+if ~exist('results', 'var') == 1
+    load bkup/bkup202392831946.mat
+end
+
+rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
+
+switch opts.method
+    case 'linear'
+        plot_cus = @plot;
+    case 'const'
+        plot_cus = @semilogy;
+end
 %
 % %% Plot the errors: Fixed N and e
 % for j = 2:length(Ns)
@@ -37,7 +37,7 @@
 %         xlabel('${{t}}$', 'FontSize', 25);
 %         ylabel('MSE', 'FontSize', 20);
 %         grid on;
-%         title(sprintf('$N = %d, \\epsilon_p = %.1f$', Ns(j), epss_p(i)), 'Interpreter', 'latex', 'FontSize', 20);
+%         % title(sprintf('$N = %d, \\epsilon_p = %.1f$', Ns(j), epss_p(i)), 'Interpreter', 'latex', 'FontSize', 20);
 %         % pause
 %         
 %         ax = gca;
@@ -48,8 +48,8 @@
 %         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
 %         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
 %         ax.Position = [left bottom ax_width ax_height];
-%         exportgraphics(gca, sprintf('fig_sarsa/Ne/%d_%.1f.png', Ns(j), epss_p(i)), 'Resolution', 600)
-%         savefig(sprintf('fig_sarsa/Ne/%d_%.1f.fig', Ns(j), epss_p(i)))
+%         exportgraphics(gca, sprintf('fig_td/Ne/%d_%.1f.png', Ns(j), epss_p(i)), 'Resolution', 600)
+%         savefig(sprintf('fig_td/Ne/%d_%.1f.fig', Ns(j), epss_p(i)))
 %         fprintf('%d_%.1f saved\n', Ns(j), epss_p(i))
 %     end
 % end
@@ -71,7 +71,7 @@
 %         xlabel('${{t}}$', 'FontSize', 25);
 %         ylabel('MSE', 'FontSize', 20);
 %         grid on;
-%         title(sprintf('$N = %d, \\epsilon_r = %.1f$', Ns(j), epss_r(k)), 'Interpreter', 'latex', 'FontSize', 20);
+%         % title(sprintf('$N = %d, \\epsilon_r = %.1f$', Ns(j), epss_r(k)), 'Interpreter', 'latex', 'FontSize', 20);
 %         % pause
 %         
 %         ax = gca;
@@ -82,8 +82,8 @@
 %         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
 %         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
 %         ax.Position = [left bottom ax_width ax_height];
-%         exportgraphics(gca, sprintf('fig_sarsa/Nr/%d_%.1f.png', Ns(j), epss_r(k)), 'Resolution', 600)
-%         savefig(sprintf('fig_sarsa/Nr/%d_%.1f.fig', Ns(j), epss_r(k)))
+%         exportgraphics(gca, sprintf('fig_td/Nr/%d_%.1f.png', Ns(j), epss_r(k)), 'Resolution', 600)
+%         savefig(sprintf('fig_td/Nr/%d_%.1f.fig', Ns(j), epss_r(k)))
 %         fprintf('%d_%.1f saved\n', Ns(j), epss_r(k))
 %     end
 % end
@@ -112,7 +112,7 @@
 %         xlabel('${{t}}$', 'FontSize', 25);
 %         ylabel('MSE', 'FontSize', 20);
 %         grid on;
-%         title(sprintf('$N = %d$', Ns(j)), 'Interpreter', 'latex', 'FontSize', 20);
+%         % title(sprintf('$N = %d$', Ns(j)), 'Interpreter', 'latex', 'FontSize', 20);
 %         % pause
 %         
 %         ax = gca;
@@ -123,8 +123,8 @@
 %         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
 %         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
 %         ax.Position = [left bottom ax_width ax_height];
-%         exportgraphics(gca, sprintf('fig_sarsa/N/%d.png', Ns(j)), 'Resolution', 600)
-%         savefig(sprintf('fig_sarsa/N/%d.fig', Ns(j)))
+%         exportgraphics(gca, sprintf('fig_td/N/%d.png', Ns(j)), 'Resolution', 600)
+%         savefig(sprintf('fig_td/N/%d.fig', Ns(j)))
 %         fprintf('%d saved\n', Ns(j))
 %     % end
 % end
@@ -155,8 +155,8 @@ for i = 1:length(epss_p)
         ax_width = outerpos(3) - ti(1) - ti(3) - 0.01;
         ax_height = outerpos(4) - ti(2) - ti(4) - 0.01;
         ax.Position = [left bottom ax_width ax_height];
-        exportgraphics(gca, sprintf('fig_sarsa/e/%.1f_%.1f.png', epss_p(i), epss_r(k)), 'Resolution', 600)
-        savefig(sprintf('fig_sarsa/e/%.1f_%.1f.fig', epss_p(i), epss_r(k)))
+        exportgraphics(gca, sprintf('fig_ql/e/%.1f_%.1f.png', epss_p(i), epss_r(k)), 'Resolution', 600)
+        savefig(sprintf('fig_td/e/%.1f_%.1f.fig', epss_p(i), epss_r(k)))
         fprintf('%.1f_%.1f saved\n', epss_p(i), epss_r(k))
     end
 end
