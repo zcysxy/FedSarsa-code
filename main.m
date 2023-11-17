@@ -34,7 +34,8 @@ alpha = 1e-2;                       % step size
 
 % Description of Notation
 %--------------------------
-% theta_st ---> True fixed point
+% theta_st ---> True fixed poin
+t
 % P ---> Transition matrix
 % R ---> Reward vector
 % p ---> Stationary distribution
