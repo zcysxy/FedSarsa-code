@@ -11,7 +11,10 @@ if ~exist('results', 'var') == 1
     load bkup/bkup2023925154454.mat
 end
 
-rel_line = mean(results{1,1,1}{end}.avg_err(opts.T-100:opts.T));
+rel_line = reshape(cell2mat(results{1,1,1}{end}.err_record), 2e4, []);
+rel_line = rel_line(opts.T-100:opts.T,:);
+rel_line = mean(rel_line);
+rel_line = repmat(rel_line, opts.T / K, 1);
 
 switch opts.method
     case 'linear'
@@ -24,13 +27,23 @@ end
 for j = 2:length(Ns)
     for i = 1:length(epss_p)
         figure('visible','off')
+        ax = gca;
         for k = 1:length(epss_r)
-            err = results{k,i,j}{end}.avg_err;
-            plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_r = %.1f$', epss_r(k)));
+            % err = results{k,i,j}{end}.avg_err;
+            % plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_r = %.1f$', epss_r(k)));
+            err = reshape(cell2mat(results{k,i,j}{end}.err_record), 2e4, []);
+            varplot(K:K:opts.T, err(K:K:opts.T,:), 'DisplayName', sprintf('$\\epsilon_r = %.1f$', epss_r(k)));
             hold on
+            ax.Children(1).EdgeColor = 'none';
+            ax.Children(1).FaceAlpha = 0.2;
+            ax.Children(1).HandleVisibility = 'off';
         end
         
-        yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+        % yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+        varplot(K:K:opts.T, rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+        ax.Children(1).EdgeColor = 'none';
+        ax.Children(1).FaceAlpha = 0.2;
+        ax.Children(1).HandleVisibility = 'off';
         legend
         
         xlim([1 opts.T]);
@@ -40,7 +53,7 @@ for j = 2:length(Ns)
         title(sprintf('$N = %d, \\epsilon_p = %.1f$', Ns(j), epss_p(i)), 'Interpreter', 'latex', 'FontSize', 20);
         % pause
         
-        ax = gca;
+        ax.YScale = "log";
         outerpos = ax.OuterPosition;
         ti = ax.TightInset;
         left = outerpos(1) + ti(1);
@@ -58,13 +71,22 @@ end
 for j = 2:length(Ns)
     for k = 1:length(epss_r)
         figure('visible','off')
+        ax = gca;
         for i = 1:length(epss_p)
-            err = results{k,i,j}{end}.avg_err;
-            plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_p = %.1f$', epss_p(i)));
+            % err = results{k,i,j}{end}.avg_err;
+            % plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_p = %.1f$', epss_p(i)));
+            err = reshape(cell2mat(results{k,i,j}{end}.err_record), 2e4, []);
+            varplot(K:K:opts.T, err(K:K:opts.T,:), 'DisplayName', sprintf('$\\epsilon_p = %.1f$', epss_p(i)));
             hold on
+            ax.Children(1).EdgeColor = 'none';
+            ax.Children(1).FaceAlpha = 0.2;
+            ax.Children(1).HandleVisibility = 'off';
         end
         
-        yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+        varplot(K:K:opts.T, rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+        ax.Children(1).EdgeColor = 'none';
+        ax.Children(1).FaceAlpha = 0.2;
+        ax.Children(1).HandleVisibility = 'off';
         legend
         
         xlim([1 opts.T]);
@@ -74,7 +96,7 @@ for j = 2:length(Ns)
         title(sprintf('$N = %d, \\epsilon_r = %.1f$', Ns(j), epss_r(k)), 'Interpreter', 'latex', 'FontSize', 20);
         % pause
         
-        ax = gca;
+        ax.YScale = "log";
         outerpos = ax.OuterPosition;
         ti = ax.TightInset;
         left = outerpos(1) + ti(1);
@@ -91,21 +113,23 @@ end
 %% Plot the errors: Fixed N
 for j = 2:length(Ns)
     % for i = 1:length(epss_p)
-        figure('visible','off')
+        figure('Visible','off')
+        ax = gca;
         for k = 1:length(epss_r)
-            err = results{k,k,j}{end}.avg_err;
-            plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_p = \\epsilon_r = %.1f$', epss_r(k)));
-            %         err_mat = [];
-            %         for k = 1:trajs*2
-            %             err_mat = [err_mat; results{i,j}{end}.err_record{k}];
-            %         end
-            %         line = stdshade(err_mat(:,K:10*K:opts.T),0.5,colors(j),K:10*K:size(err_mat,2),12);
-            %         set(gca, 'YScale', 'log')
-            %         ylim([3e0,1.3e2])
+            % err = results{k,k,j}{end}.avg_err;
+            % plot_cus(K:K:opts.T, err(K:K:opts.T), 'DisplayName', sprintf('$\\epsilon_p = \\epsilon_r = %.1f$', epss_r(k)));
+            err = reshape(cell2mat(results{k,k,j}{end}.err_record), 2e4, []);
+            varplot(K:K:opts.T, err(K:K:opts.T,:), 'DisplayName', sprintf('$\\epsilon_p = \\epsilon_r = %.1f$', epss_r(k)));
             hold on
+            ax.Children(1).EdgeColor = 'none';
+            ax.Children(1).FaceAlpha = 0.2;
+            ax.Children(1).HandleVisibility = 'off';
         end
         
-        yline(rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+        varplot(K:K:opts.T, rel_line,'r--', 'LineWidth',  2, 'DisplayName', '$N=1$')
+        ax.Children(1).EdgeColor = 'none';
+        ax.Children(1).FaceAlpha = 0.2;
+        ax.Children(1).HandleVisibility = 'off';
         legend
         
         xlim([1 opts.T]);
@@ -115,7 +139,7 @@ for j = 2:length(Ns)
         title(sprintf('$N = %d$', Ns(j)), 'Interpreter', 'latex', 'FontSize', 20);
         % pause
         
-        ax = gca;
+        ax.YScale = "log";
         outerpos = ax.OuterPosition;
         ti = ax.TightInset;
         left = outerpos(1) + ti(1);
