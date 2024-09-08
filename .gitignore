@@ -2,6 +2,8 @@
 *.csv
 *.mat
 *.pdf
+*.fig
+.MATLABDriveTag
 fig_td
 fig_ql
 fig_sarsa
